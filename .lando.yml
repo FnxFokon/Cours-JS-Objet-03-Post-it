@@ -1,4 +1,4 @@
-name: ern23-starter-webpack
+name: post-it
 services:
   node:
     type: node:16
