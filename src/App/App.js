@@ -40,7 +40,7 @@ class App {
         }
         console.log('arrNotas', this.arrNotas);
         // On lance le rendu des notes
-        // TODO: faire le rendu des notes
+        this.renderNotes();
     }
 
     // Méthode pour créer l'interface graphique
@@ -106,6 +106,24 @@ class App {
 
     }
 
+    // Méthode pour afficher les notes
+    renderNotes() {
+        // On vide le <ol>
+        this.elOlNoteList.innerHTML = '';
+
+        // On retrie par date de mise à jour
+        this.arrNotas.sort((a, b) => {
+            return b.dateUpdate - a.dateUpdate;
+        });
+
+        // On boucle sur le tableau de notes
+        for (let note of this.arrNotas) {
+            // On ajoute la note dans le <ol>
+            this.elOlNoteList.append(note.getDom()); // On récupère l'élément HTML de la note
+        }
+
+
+    }
 }
 
 const app = new App();
