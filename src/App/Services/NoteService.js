@@ -1,6 +1,6 @@
 const STORAGE_NAME = 'notabene';
 
-// export = Permet d'utiliser la class dans d'autre fichier
+// export = Permet d'utiliser la class dans d'autres fichiers
 // default = recuperer seulement cette classe dans ce fichier
 
 class NoteService {
