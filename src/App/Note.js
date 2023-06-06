@@ -1,3 +1,5 @@
+import app from './App';
+
 const MODE_VIEW = 'view';
 const MODE_EDIT = 'edit';
 
@@ -9,7 +11,7 @@ class Note {
     dateCreate;
     dateUpdate;
 
-    // On déclare le constructeur dqui récupère un objet littéral
+    // On déclare le constructeur qui récupère un objet littéral
     // et qui va hydrater notre instance de Note 
 
     constructor(noteLitteral) {
@@ -65,7 +67,81 @@ class Note {
         const elTitle = elLi.querySelector('.nota-title'); // On récupère l'élément qui a la class nota-title
         const elContent = elLi.querySelector('.nota-content');  // On récupère l'élément qui a la classe nota-content
         const idxLi = Array.from(elLi.parentElement.children).indexOf(elLi); // On récupère l'index de l'élément li dans la liste des li
-        const objNote = {}; // TODO: récupération de arrayNote[idxLi] depuis app
+        const objNote = app.arrNotas[idxLi]; // TODO: récupération de arrayNote[idxLi] depuis app
+
+        // Si le Li n'est pas cohérent avec les datas on return
+        if (!app.isEditMode && elTitle.textContent !== objNote.title) return;
+
+        // Gérer les différents évenements des boutons
+        switch (elBtn.dataset.role) {
+            case 'edit':
+                // Si on n'est pas sensé avoir accès à edit, on sort
+                if (app.isEditMode) return;
+
+                // On passe en mode edit
+                app.isEditMode = true;
+
+                // On passe le datased.mode en edit
+                elLi.dataset.mode = MODE_EDIT;
+
+                // On passe le contenue de l'élément
+                elTitle.contentEditable = elContent.contentEditable = true;
+
+                break;
+
+            case 'delete':
+                // Si on n'est pas sensé avoir accès à delete, on sort
+                if (app.isEditMode) return;
+
+                // On supprime le nota du tableau
+                app.arrNotas.splice(idxLi, 1);
+
+                // Sauvegarde des données
+                app.noteService.saveStorage(app.arrNotas);
+
+                // On regénère les notes
+                app.renderNotes();
+
+                break;
+
+            case 'save':
+                // Si on n'est pas sensé avoir accès à cancel, on sort
+                if (!app.isEditMode) return;
+
+                // Mise à jour des donnée du tableau
+                objNote.title = elTitle.textContent;
+                objNote.content = elContent.textContent;
+                objNote.dateUpdate = Date.now();
+
+                // On enregistre dans le local storage
+                app.noteService.saveStorage(app.arrNotas);
+
+                // On repasse en mode view
+                app.isEditMode = false;
+
+                // On regénere un rendu de note
+                app.renderNotes();
+
+                break;
+
+            case 'cancel':
+                // Si on n'est pas sensé avoir accès à cancel, on sort
+                if (!app.isEditMode) return;
+
+                // On passe en mode view
+                app.isEditMode = false;
+
+                // On passe le dataset.mode en view
+                elLi.dataset.mode = MODE_VIEW;
+
+                // On regénere un rendu de note
+                app.renderNotes();
+
+                break;
+
+            default:
+                return;
+        }
 
     }
 }

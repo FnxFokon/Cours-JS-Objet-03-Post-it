@@ -69,7 +69,8 @@ class App {
         elButtonNewNoteAdd.type = 'button';
         elButtonNewNoteAdd.id = 'new-note-add';
         elButtonNewNoteAdd.textContent = '➕';
-        // TODO: Ajouter un eventListener sur le bouton
+        // Ajouter un eventListener sur le bouton
+        elButtonNewNoteAdd.addEventListener('click', this.handleNewNoteAdd.bind(this));
 
         // Input + textarea + button dans le form
         elForm.append(this.elInputNewNoteTitle, this.elInputNewNoteContent, elButtonNewNoteAdd);
@@ -83,7 +84,9 @@ class App {
         elButtonClearAll.type = 'button';
         elButtonClearAll.id = 'clear-all';
         elButtonClearAll.textContent = '🗑️';
-        // TODO: Ajouter un eventListener sur le bouton
+
+        // Ajouter un eventListener sur le bouton
+        elButtonClearAll.addEventListener('click', this.handlerClearAll.bind(this));
 
         // button dans la div
         elDivClear.append(elButtonClearAll);
@@ -105,6 +108,89 @@ class App {
         document.body.append(elHeader, elMain);
 
     }
+
+    handlerClearAll = _ => {
+        // Vidage du tableau de travail
+        this.arrNotas = [];
+
+        // Suppression des données stockées
+        this.noteService.saveStorage(this.arrNotas);
+
+        // On vide la liste à l'affichage
+        this.renderNotes(); // Si on a pas fais le traitement il aurait fallu faire : this.elOlNoteList.innerHTML = '';
+    };
+
+    // Méthodes pour ajouter une note
+    handleNewNoteAdd() {
+        // On crée nos constantes pour récupérer les valeurs des inputs
+        const newTitle = this.elInputNewNoteTitle.value.trim();
+        const newContent = this.elInputNewNoteContent.value.trim();
+        const now = Date.now();
+
+        // On check si les champs sont vides
+        if (newTitle == '' && newContent == '') { // on peux aussi écrire if (!title || !content){}
+            alert('Veuillez remplir au moins un champs');
+
+        } else {
+            // On crée une nouvelle note
+            // On doit reconstruire un objet litéral
+            const newNoteLiteral = {
+                title: newTitle == "" ? "Note sans titre" : newTitle,
+                content: newContent == "" ? "Note sans contenue" : newContent,
+                dateCreate: now,
+                dateUpdate: now
+            };
+            // On rajoute l'objet literal dans le tableau de notes
+            this.arrNotas.push(new Note(newNoteLiteral));
+
+            // Sauvegarde des données dans le local Storage
+            this.noteService.saveStorage(this.arrNotas);
+
+            // On vide le formulaire
+            this.elInputNewNoteTitle.value = this.elInputNewNoteContent.value = '';
+
+            // On met le focus sur le premier champs
+            this.elInputNewNoteTitle.focus();
+
+            // On regénère les notes
+            this.renderNotes();
+        }
+    }
+
+    //     if (newTitle == '' && newContent == '') { // on peux aussi écrire if (!title || !content){}
+    //         alert('Veuillez remplir au moins un champs');
+
+    //     } else if (newTitle == '') {
+    //         this.elInputNewNoteTitle.value = 'Note sans Titre';
+
+    //     } else if (newContent == '') {
+    //         this.elInputNewNoteContent.value = 'Note sans contenue';
+
+    //     } else {
+    //         // On crée une nouvelle note
+    //         // On doit reconstruire un objet litéral
+    //         const newNoteLiteral = {
+    //             title: newTitle,
+    //             content: newContent,
+    //             dateCreate: now,
+    //             dateUpdate: now
+    //         };
+    //         // On rajoute l'objet literal dans le tableau de notes
+    //         this.arrNotas.push(new Note(newNoteLiteral));
+
+    //         // Sauvegarde des données dans le local Storage
+    //         this.noteService.saveStorage(this.arrNotas);
+
+    //         // On vide le formulaire
+    //         this.elInputNewNoteTitle.value = this.elInputNewNoteContent.value = '';
+
+    //         // On met le focus sur le premier champs
+    //         this.elInputNewNoteTitle.focus();
+
+    //         // On regénère les notes
+    //         this.renderNotes();
+    //     }
+    // }
 
     // Méthode pour afficher les notes
     renderNotes() {
